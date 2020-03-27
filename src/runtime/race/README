@@ -11,3 +11,7 @@ race_linux_ppc64le.syso built with LLVM 810ae8ddac890a6613d814c0b5415c7fcb7f5cca
 race_netbsd_amd64.syso built with LLVM 810ae8ddac890a6613d814c0b5415c7fcb7f5cca and Go 8c6876e9a481a2ea48070d3285a07163f564877b.
 race_windows_amd64.syso built with LLVM 810ae8ddac890a6613d814c0b5415c7fcb7f5cca and Go 8c6876e9a481a2ea48070d3285a07163f564877b.
 race_linux_arm64.syso built with LLVM 810ae8ddac890a6613d814c0b5415c7fcb7f5cca and Go 8c6876e9a481a2ea48070d3285a07163f564877b.
+
+runtime/race 该package包含数据竞争检测器的运行时库。
+它基于 ThreadSanitizer 竞争检测器，该检测器目前是LLVM项目(https://github.com/llvm/llvm-project/tree/master/compiler-rt)的一部分。
+使用 golang.org/x/build/cmd/racebuild 来更新 .syso 文件。

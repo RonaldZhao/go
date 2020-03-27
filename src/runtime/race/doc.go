@@ -6,4 +6,9 @@
 // No public interface is provided.
 // For details about the race detector see
 // https://golang.org/doc/articles/race_detector.html
+
+// race包实现数据竞争检测逻辑。
+// 没有提供公共接口。
+// 关于竞争检测器的细节参见：
+// https://golang.org/doc/articles/race_detector.html
 package race
