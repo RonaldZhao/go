@@ -11,5 +11,9 @@ package race
 // The prebuilt race runtime lives in race_GOOS_GOARCH.syso.
 // Calls to the runtime are done directly from src/runtime/race.go.
 
+// 该文件仅确保我们在race build时链接到runtime/cgo，这反过来又确保了runtime使用pthread_create创建线程。
+// 预编译的运行时位于race_GOOS_GOARCH.syso中。
+// 直接从src/runtime/race.go完成对运行时的调用。
+
 // void __race_unused_func(void);
 import "C"
