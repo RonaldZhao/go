@@ -120,6 +120,7 @@ func main() {
 	g.m.g0.racectx = 0
 
 	// Max stack size is 1 GB on 64-bit, 250 MB on 32-bit.
+	// 执行栈的最大限制：64位系统1GB，32位系统250MB。
 	// Using decimal instead of binary GB and MB because
 	// they look nicer in the stack overflow failure message.
 	if sys.PtrSize == 8 {
@@ -132,6 +133,7 @@ func main() {
 	mainStarted = true
 
 	if GOARCH != "wasm" { // no threads on wasm yet, so no sysmon
+		// 启动系统后台监控（定期垃圾回收以及并发任务调度相关的信息）
 		systemstack(func() {
 			newm(sysmon, nil)
 		})
@@ -165,6 +167,7 @@ func main() {
 	// Record when the world started.
 	runtimeInitTime = nanotime()
 
+	// 启动垃圾回收器后台操作
 	gcenable()
 
 	main_init_done = make(chan bool)
@@ -539,6 +542,7 @@ func schedinit() {
 		_g_.racectx, raceprocctx0 = raceinit()
 	}
 
+	// 系统线程数量限制
 	sched.maxmcount = 10000
 
 	tracebackinit()
@@ -556,9 +560,13 @@ func schedinit() {
 	msigsave(_g_.m)
 	initSigmask = _g_.m.sigmask
 
+	// 处理命令行参数和环境变量
 	goargs()
 	goenvs()
+
 	parsedebugvars()
+
+	// 初始化gc
 	gcinit()
 
 	sched.lastpoll = uint64(nanotime())
