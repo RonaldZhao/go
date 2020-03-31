@@ -857,10 +857,14 @@ func casGFromPreempted(gp *g, old, new uint32) bool {
 // stopTheWorld must not be called from a system stack and the caller
 // must not hold worldsema. The caller must call startTheWorld when
 // other P's should resume execution.
+// stopTheWorld 停止所有P执行goroutine，在GC安全点中断所有goroutine，并将reason参数
+// 记录为停止原因。返回时，仅当前goroutine的P正在执行。stopTheWorld禁止从系统堆栈
+// 调用，且调用者禁止持有worldsema。当其他P恢复执行时调用者必须调用startTheWorld。
 //
 // stopTheWorld is safe for multiple goroutines to call at the
 // same time. Each will execute its own stop, and the stops will
 // be serialized.
+// stopTheWorld
 //
 // This is also used by routines that do stack dumps. If the system is
 // in panic or being exited, this may not reliably stop all
@@ -4133,12 +4137,15 @@ func (pp *p) init(id int32) {
 
 // destroy releases all of the resources associated with pp and
 // transitions it to status _Pdead.
+// destroy
 //
 // sched.lock must be held and the world must be stopped.
 func (pp *p) destroy() {
 	// Move all runnable goroutines to the global queue
+	// 将所有可运行的goroutines从本地任务队列移动到全局队列
 	for pp.runqhead != pp.runqtail {
 		// Pop from tail of local queue
+		// 从本地队列尾部pop
 		pp.runqtail--
 		gp := pp.runq[pp.runqtail%uint32(len(pp.runq))].ptr()
 		// Push onto head of global queue
@@ -4200,8 +4207,11 @@ func (pp *p) destroy() {
 		pp.mspancache.len = 0
 		pp.pcache.flush(&mheap_.pages)
 	})
+
+	// 释放当前P绑定的cache资源
 	freemcache(pp.mcache)
 	pp.mcache = nil
+
 	gfpurge(pp)
 	traceProcFree(pp)
 	if raceenabled {
@@ -4309,10 +4319,12 @@ func procresize(nprocs int32) *p {
 	mcache0 = nil
 
 	// release resources from unused P's
+	// 从未使用的P中释放资源
 	for i := nprocs; i < old; i++ {
 		p := allp[i]
 		p.destroy()
 		// can't free P itself because it can be referenced by an M in syscall
+		// 不能释放P本身，因为它可能在系统调用(syscall)重新被M引用。
 	}
 
 	// Trim allp.
